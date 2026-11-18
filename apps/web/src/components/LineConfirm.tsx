@@ -6,28 +6,35 @@ import { lineLabel } from '../lib/lines'
 import { applyTheme, readTheme } from '../lib/theme'
 
 /**
- * ยืนยันฝั่งหลังกด "เข้าสู่ระบบ" — ฝั่งมาจากบัญชี (profiles.business_line)
- * popup นี้ให้รู้ตัวก่อนว่ากำลังเข้าฝั่งไหน กดยกเลิก = ออกจากระบบทันที
- * ยกเว้นบัญชีใน line_switchers (0044) ที่เลือกได้ว่าจะเข้าฝั่งไหน
+ * ยืนยันฝั่งทุกครั้งที่เข้าใช้งาน — ฝั่งมาจากบัญชี (profiles.business_line)
+ * กดยกเลิก = ออกจากระบบทันที ยกเว้นบัญชีใน line_switchers (0044) ที่เลือกได้ว่าจะเข้าฝั่งไหน
  *
- * ธงเก็บใน sessionStorage: ตั้งก่อนเรียก signIn (Login.tsx) เพราะ onAuthStateChange ยิงก่อน
- * promise ของ signIn คืนค่า — ตั้งทีหลังจะหลุดไปหน้าหลักโดยไม่ถาม
- * เปิดแอปใหม่ด้วย session เดิมจะไม่ถามซ้ำ (ถามเฉพาะตอนกดเข้าสู่ระบบ)
+ * เก็บ uid ที่ยืนยันแล้วใน sessionStorage (อายุเท่าแท็บ): ถามใหม่เมื่อ
+ *   - กดเข้าสู่ระบบ (Login.tsx ล้างก่อน signIn) หรือออกจากระบบ (auth.tsx ล้าง)
+ *   - เปิดแท็บ/เบราว์เซอร์ใหม่ทั้งที่ session ยังค้าง
+ * กด refresh ในแท็บเดิมไม่ถามซ้ำ
  */
-const KEY = 'pending-line-confirm'
+const KEY = 'line-confirmed-uid'
 
-export function setPendingLineConfirm(on: boolean) {
+export function clearLineConfirmed() {
   try {
-    if (on) sessionStorage.setItem(KEY, '1')
-    else sessionStorage.removeItem(KEY)
+    sessionStorage.removeItem(KEY)
   } catch {
-    // storage ถูกบล็อก → ข้ามการยืนยันไป ไม่กระทบการเข้าใช้งาน
+    // storage ถูกบล็อก → ถามทุกครั้งที่โหลดหน้า ไม่กระทบความถูกต้อง
   }
 }
 
-export function isPendingLineConfirm(): boolean {
+export function markLineConfirmed(uid: string) {
   try {
-    return sessionStorage.getItem(KEY) === '1'
+    sessionStorage.setItem(KEY, uid)
+  } catch {
+    // เช่นเดียวกับด้านบน
+  }
+}
+
+export function isLineConfirmed(uid: string): boolean {
+  try {
+    return sessionStorage.getItem(KEY) === uid
   } catch {
     return false
   }
@@ -48,11 +55,13 @@ function scopeText(line: BusinessLine) {
 }
 
 export default function LineConfirm({
+  uid,
   line,
   email,
   onConfirm,
   onCancel,
 }: {
+  uid: string
   line: BusinessLine
   email: string
   /** เลือกฝั่งแล้วกดยืนยัน — ถ้าเลือกต่างจาก line ผู้เรียกต้องย้ายฝั่งให้ก่อน (switchLine) */
@@ -66,12 +75,13 @@ export default function LineConfirm({
 
   // บัญชีใน line_switchers (0044) เลือกฝั่งได้ — ไม่มีสิทธิ์/เรียกไม่สำเร็จ = เลือกไม่ได้
   const { data: canSwitch = false } = useQuery({
-    queryKey: ['can_switch_line'],
+    // ผูกกับ uid และไม่เก็บค้าง — สลับบัญชีในแท็บเดิมต้องไม่ได้คำตอบของบัญชีก่อน
+    queryKey: ['can_switch_line', uid],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('can_switch_line')
       return !error && data === true
     },
-    staleTime: Infinity,
+    gcTime: 0,
   })
 
   // ยังอยู่ในขั้นตอน login — คงธีมมืดเหมือนหน้า login

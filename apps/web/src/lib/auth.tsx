@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import { clearLineConfirmed } from '../components/LineConfirm'
 import { supabase } from './supabase'
 import { useSessionTracking } from './sessionTracking'
 import type { AppRole, BusinessLine, Profile } from '../types/database'
@@ -126,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // บันทึก logout_at ก่อนตัด session จริง — ได้เวลาออกที่แม่นยำสำหรับคนที่กดออกเองจริง ๆ
         // (ทำก่อน signOut เสมอ เพราะ signOut แล้ว session หาย ไม่มีสิทธิ์ update แถวตัวเองอีก)
         await markLoggedOut()
+        clearLineConfirmed() // เข้าใหม่ต้องถามฝั่งอีกครั้ง
         await supabase.auth.signOut()
       },
     }),

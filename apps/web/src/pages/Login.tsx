@@ -2,7 +2,7 @@ import { useLayoutEffect, useState, type FormEvent, type KeyboardEvent } from 'r
 import { supabase } from '../lib/supabase'
 import { IconEye, IconEyeOff, IconLock, IconMail } from '../components/icons'
 import { applyTheme, readTheme } from '../lib/theme'
-import { setPendingLineConfirm } from '../components/LineConfirm'
+import { clearLineConfirmed } from '../components/LineConfirm'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -26,19 +26,17 @@ export default function Login() {
     setBusy(true)
     setMsg(null)
 
-    // ตั้งก่อน signIn — onAuthStateChange ยิงก่อน promise คืนค่า (ดู LineConfirm.tsx)
-    setPendingLineConfirm(true)
+    // ล้างก่อน signIn — onAuthStateChange ยิงก่อน promise คืนค่า (ดู LineConfirm.tsx)
+    clearLineConfirmed()
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       })
       if (error) {
-        setPendingLineConfirm(false)
         setMsg({ kind: 'err', text: translateAuthError(error.message) })
       }
     } catch {
-      setPendingLineConfirm(false)
       setMsg({ kind: 'err', text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่' })
     } finally {
       setBusy(false)

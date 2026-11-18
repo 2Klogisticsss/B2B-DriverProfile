@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from './lib/auth'
 import { IS_DEMO, supabase } from './lib/supabase'
 import { roleLabel, fmtNum } from './lib/format'
 import LineBadge from './components/LineBadge'
-import LineConfirm, { isPendingLineConfirm, setPendingLineConfirm } from './components/LineConfirm'
+import LineConfirm, { isLineConfirmed, markLineConfirmed } from './components/LineConfirm'
 import {
   IconBan,
   IconClock,
@@ -300,12 +300,14 @@ function Shell() {
     )
   }
 
-  // เพิ่งกดเข้าสู่ระบบ → ให้ยืนยันฝั่งก่อนเข้าแอป (ไม่รู้ฝั่ง = ไม่มี profile ข้ามไป ฐานข้อมูลไม่ส่งอะไรให้อยู่แล้ว)
-  if (isPendingLineConfirm()) {
+  // ยืนยันฝั่งทุกครั้งที่เข้าใช้งาน (ไม่รู้ฝั่ง = ไม่มี profile ข้ามไป ฐานข้อมูลไม่ส่งอะไรให้อยู่แล้ว)
+  if (!IS_DEMO && !isLineConfirmed(session.user.id)) {
     if (loading) return <BootScreen />
     if (businessLine) {
+      const uid = session.user.id
       return (
         <LineConfirm
+          uid={uid}
           line={businessLine}
           email={session.user.email ?? ''}
           onConfirm={async (chosen) => {
@@ -313,17 +315,13 @@ function Shell() {
               await switchLine(chosen)
               qc.clear() // ข้อมูลที่แคชไว้เป็นของฝั่งเดิม
             }
-            setPendingLineConfirm(false)
+            markLineConfirmed(uid)
             rerender()
           }}
-          onCancel={async () => {
-            setPendingLineConfirm(false)
-            await signOut()
-          }}
+          onCancel={signOut}
         />
       )
     }
-    setPendingLineConfirm(false)
   }
 
   // โชว์อีเมลเป็นหลัก ไม่ใช่ full_name — full_name เป็นแค่ชื่อเล่นสั้น ๆ (เช่น "พี่ซ้ง")
