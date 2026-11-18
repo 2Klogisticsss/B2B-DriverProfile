@@ -39,6 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  // uid ที่โหลด profile เสร็จแล้ว — กันจังหวะหลัง signIn ที่ session มาแล้วแต่ effect โหลด profile
+  // ยังไม่ทันตั้ง loading=true (มีหนึ่ง render ที่ loading=false ทั้งที่ยังไม่รู้ profile/ฝั่ง)
+  const [loadedUid, setLoadedUid] = useState<string | null>(null)
   // บันทึกเวลาเข้า/ออกระบบลง user_activity_sessions — โผล่เป็นประเภทกิจกรรม "เข้าใช้งานระบบ"
   // ในหน้าบันทึกกิจกรรม (0035_user_activity_sessions.sql)
   const { markLoggedOut } = useSessionTracking(session?.user?.id)
@@ -90,7 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('[auth] โหลดข้อมูลผู้ใช้ไม่สำเร็จ', e)
         setProfile(null)
       } finally {
-        if (alive) setLoading(false)
+        if (alive) {
+          setLoadedUid(uid)
+          setLoading(false)
+        }
       }
     })()
 
@@ -105,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       session,
       profile,
-      loading,
+      loading: loading || (!!session && loadedUid !== session.user.id),
       can: (...roles) => (profile ? roles.includes(profile.role) : false),
       canSeeActivityLog: !!profile?.email && ACTIVITY_LOG_EMAILS.includes(profile.email.toLowerCase()),
       businessLine: profile?.business_line ?? null,
@@ -116,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await supabase.auth.signOut()
       },
     }),
-    [session, profile, loading, markLoggedOut],
+    [session, profile, loading, loadedUid, markLoggedOut],
   )
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

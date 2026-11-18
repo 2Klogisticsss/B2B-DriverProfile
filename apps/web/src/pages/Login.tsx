@@ -1,11 +1,14 @@
-import { useLayoutEffect, useState, type FormEvent } from 'react'
+import { useLayoutEffect, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { supabase } from '../lib/supabase'
-import { IconLock, IconMail } from '../components/icons'
+import { IconEye, IconEyeOff, IconLock, IconMail } from '../components/icons'
 import { applyTheme, readTheme } from '../lib/theme'
+import { setPendingLineConfirm } from '../components/LineConfirm'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPw, setShowPw] = useState(false)
+  const [capsLock, setCapsLock] = useState(false)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<{ kind: 'err' | 'ok'; text: string } | null>(null)
 
@@ -23,10 +26,27 @@ export default function Login() {
     setBusy(true)
     setMsg(null)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setMsg({ kind: 'err', text: translateAuthError(error.message) })
-    setBusy(false)
+    // ตั้งก่อน signIn — onAuthStateChange ยิงก่อน promise คืนค่า (ดู LineConfirm.tsx)
+    setPendingLineConfirm(true)
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      })
+      if (error) {
+        setPendingLineConfirm(false)
+        setMsg({ kind: 'err', text: translateAuthError(error.message) })
+      }
+    } catch {
+      setPendingLineConfirm(false)
+      setMsg({ kind: 'err', text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่' })
+    } finally {
+      setBusy(false)
+    }
   }
+
+  const trackCapsLock = (e: KeyboardEvent<HTMLInputElement>) =>
+    setCapsLock(e.getModifierState('CapsLock'))
 
   return (
     <div className="login-page">
@@ -47,14 +67,16 @@ export default function Login() {
 
         <form className="card card-pad login-card" onSubmit={submit}>
           <div className="field">
-            <label htmlFor="email">อีเมลบริษัท</label>
+            {/* ทีม EXPRESS ใช้ Gmail ส่วนตัว จึงไม่ระบุว่าเป็นอีเมลบริษัท */}
+            <label htmlFor="email">อีเมล</label>
             <div className="input-icon">
               <IconMail size={16} />
               <input
                 id="email"
                 type="email"
                 autoComplete="username"
-                placeholder="you@2klogistics.co.th"
+                autoFocus
+                placeholder="อีเมลที่ลงทะเบียนไว้"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -69,28 +91,60 @@ export default function Login() {
               <IconLock size={16} />
               <input
                 id="pw"
-                type="password"
+                type={showPw ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ paddingLeft: 34 }}
+                onKeyDown={trackCapsLock}
+                onKeyUp={trackCapsLock}
+                onBlur={() => setCapsLock(false)}
+                aria-describedby={capsLock ? 'pw-caps' : undefined}
+                style={{ paddingLeft: 34, paddingRight: 42 }}
               />
+              <button
+                type="button"
+                className="pw-toggle"
+                onClick={() => setShowPw((v) => !v)}
+                aria-label={showPw ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                aria-pressed={showPw}
+                title={showPw ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+              >
+                {showPw ? <IconEyeOff size={18} /> : <IconEye size={18} />}
+              </button>
             </div>
+            {capsLock && (
+              <p id="pw-caps" className="login-hint warn" role="status">
+                Caps Lock เปิดอยู่
+              </p>
+            )}
           </div>
 
           {msg && (
             <div
               className={`note-box ${msg.kind === 'err' ? 'err' : 'ok'}`}
+              role="alert"
               style={{ marginBottom: 14 }}
             >
               {msg.text}
             </div>
           )}
 
-          <button className="btn btn-primary" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'กำลังดำเนินการ…' : 'เข้าสู่ระบบ'}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%' }}
+            disabled={busy}
+            aria-busy={busy}
+          >
+            {busy ? 'กำลังเข้าสู่ระบบ…' : 'เข้าสู่ระบบ'}
           </button>
+
+          {/* ponytail: ไม่มีระบบรีเซ็ตรหัสเอง — บัญชีอนุมัติโดยองค์กร ให้ admin รีเซ็ตใน Supabase.
+              ถ้าต้องการให้รีเซ็ตเองทางอีเมล ต้องเพิ่ม resetPasswordForEmail + หน้าตั้งรหัสใหม่ */}
+          <p className="login-hint muted" style={{ textAlign: 'center', marginTop: 14 }}>
+            ลืมรหัสผ่านหรือเข้าใช้งานไม่ได้? ติดต่อผู้ดูแลระบบของฝ่าย
+          </p>
         </form>
 
         <p className="login-footer">เข้าถึงได้เฉพาะบัญชีที่ได้รับอนุมัติจากองค์กร · 2K Logistics</p>
@@ -103,5 +157,9 @@ function translateAuthError(msg: string): string {
   const m = msg.toLowerCase()
   if (m.includes('invalid login credentials')) return 'อีเมลหรือรหัสผ่านไม่ถูกต้อง'
   if (m.includes('email not confirmed')) return 'ยังไม่ได้ยืนยันอีเมล ตรวจกล่องจดหมายก่อน'
+  if (m.includes('rate limit') || m.includes('too many'))
+    return 'ลองเข้าสู่ระบบบ่อยเกินไป รอสักครู่แล้วลองใหม่'
+  if (m.includes('failed to fetch') || m.includes('network'))
+    return 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่'
   return msg
 }

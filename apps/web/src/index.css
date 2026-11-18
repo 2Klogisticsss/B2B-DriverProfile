@@ -684,6 +684,118 @@ h3 {
   height: 3px;
   background: linear-gradient(90deg, var(--brand), var(--brand-strong));
 }
+/* ปุ่มแสดง/ซ่อนรหัสผ่าน วางทับขอบขวาของช่อง */
+.pw-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.pw-toggle:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+}
+.pw-toggle:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+.login-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+.login-hint.warn {
+  color: var(--warn);
+}
+/* popup ยืนยันฝั่งหลังกดเข้าสู่ระบบ (LineConfirm.tsx) — สีแถบบน/ชื่อฝั่งตามฝั่ง */
+.line-confirm-backdrop {
+  align-items: center;
+}
+.line-confirm {
+  --lc: var(--brand);
+  position: relative;
+  overflow: hidden;
+  max-width: 460px;
+}
+.line-confirm.express {
+  --lc: var(--express);
+}
+.line-confirm::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--lc);
+}
+.line-confirm-body {
+  padding: 26px 24px 18px;
+}
+.line-confirm-eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.line-confirm h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.line-confirm-name {
+  color: var(--lc);
+  letter-spacing: 0.04em;
+}
+.line-confirm-meta {
+  margin: 18px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  display: grid;
+  gap: 10px;
+}
+.line-confirm-meta > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.line-confirm-meta dt {
+  font-size: 13px;
+  color: var(--muted);
+}
+.line-confirm-meta dd {
+  margin: 0;
+  display: grid;
+  justify-items: end;
+  font-size: 13px;
+  text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.line-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 420px) {
+  .line-confirm-actions {
+    flex-direction: column-reverse;
+  }
+  .line-confirm-actions .btn {
+    width: 100%;
+  }
+}
 .login-footer {
   margin: 18px 0 0;
   text-align: center;

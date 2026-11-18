@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { NavLink, Navigate, Route, Routes } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './lib/auth'
 import { IS_DEMO, supabase } from './lib/supabase'
 import { roleLabel, fmtNum } from './lib/format'
 import LineBadge from './components/LineBadge'
+import LineConfirm, { isPendingLineConfirm, setPendingLineConfirm } from './components/LineConfirm'
 import {
   IconBan,
   IconClock,
@@ -254,6 +255,7 @@ function Shell() {
   // key ที่ไม่มีตัวผู้ใช้ เช่น ['customers'] ไม่ล้างจะเห็นข้อมูลของบัญชีก่อนหน้า (อาจเป็นอีกฝั่ง)
   // จนกว่าแคชจะหมดอายุ ฐานข้อมูลไม่ได้ส่งข้อมูลข้ามฝั่งให้ แต่ของที่ค้างในเครื่องก็ต้องไม่โชว์
   const qc = useQueryClient()
+  const [, rerender] = useReducer((n: number) => n + 1, 0)
   const uid = session?.user?.id
   const lastUid = useRef(uid)
   useEffect(() => {
@@ -296,6 +298,29 @@ function Shell() {
         </div>
       </main>
     )
+  }
+
+  // เพิ่งกดเข้าสู่ระบบ → ให้ยืนยันฝั่งก่อนเข้าแอป (ไม่รู้ฝั่ง = ไม่มี profile ข้ามไป ฐานข้อมูลไม่ส่งอะไรให้อยู่แล้ว)
+  if (isPendingLineConfirm()) {
+    if (loading) return <BootScreen />
+    if (businessLine) {
+      return (
+        <LineConfirm
+          line={businessLine}
+          email={session.user.email ?? ''}
+          name={profile?.full_name}
+          onConfirm={() => {
+            setPendingLineConfirm(false)
+            rerender()
+          }}
+          onCancel={async () => {
+            setPendingLineConfirm(false)
+            await signOut()
+          }}
+        />
+      )
+    }
+    setPendingLineConfirm(false)
   }
 
   // โชว์อีเมลเป็นหลัก ไม่ใช่ full_name — full_name เป็นแค่ชื่อเล่นสั้น ๆ (เช่น "พี่ซ้ง")
