@@ -1,0 +1,8 @@
+# Cloudflare Pages security headers
+# กันเว็บอื่นฝังแอปใน iframe (clickjacking) — ใส่แค่ frame-ancestors ไม่ใช่ CSP เต็ม
+# CSP เต็มต้องไล่ทดสอบฟอนต์/worker/Supabase ก่อน ไม่งั้นหน้าพัง
+/*
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
