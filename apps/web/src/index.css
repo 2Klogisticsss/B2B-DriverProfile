@@ -716,15 +716,20 @@ h3 {
 .login-hint.warn {
   color: var(--warn);
 }
-/* popup ยืนยันฝั่งหลังกดเข้าสู่ระบบ (LineConfirm.tsx) — สีแถบบน/ชื่อฝั่งตามฝั่ง */
-.line-confirm-backdrop {
+/* popup ยืนยันแผนกหลังกดเข้าสู่ระบบ (LineConfirm.tsx) — จัดกึ่งกลางทั้งกล่อง สีแถบบน/ปุ่ม/ชื่อแผนกตามแผนก
+   ตัวเลือกซ้อนคลาสกับ .dialog-backdrop เพราะกฎนั้นประกาศทีหลังและตั้ง align-items: flex-start ทับ */
+.dialog-backdrop.line-confirm-backdrop {
   align-items: center;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 .line-confirm {
   --lc: var(--brand);
   position: relative;
   overflow: hidden;
-  max-width: 460px;
+  max-width: 480px;
+  text-align: center;
 }
 .line-confirm.express {
   --lc: var(--express);
@@ -737,7 +742,13 @@ h3 {
   background: var(--lc);
 }
 .line-confirm-body {
-  padding: 26px 24px 18px;
+  padding: 32px 32px 24px;
+}
+.line-confirm-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r);
+  margin-bottom: 14px;
 }
 .line-confirm-eyebrow {
   margin: 0 0 6px;
@@ -748,66 +759,98 @@ h3 {
 }
 .line-confirm h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 21px;
+  line-height: 1.35;
 }
 .line-confirm-name {
   color: var(--lc);
   letter-spacing: 0.04em;
 }
-.line-confirm-meta {
-  margin: 18px 0;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  display: grid;
-  gap: 10px;
-}
-.line-confirm-meta > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-.line-confirm-meta dt {
+.line-confirm-account {
+  margin: 8px 0 0;
   font-size: 13px;
   color: var(--muted);
-}
-.line-confirm-meta dd {
-  margin: 0;
-  display: grid;
-  justify-items: end;
-  font-size: 13px;
-  text-align: right;
-  min-width: 0;
   overflow-wrap: anywhere;
+}
+.line-confirm-account b {
+  color: var(--ink);
+  font-weight: 500;
+}
+.line-confirm-single {
+  margin: 22px 0 0;
+}
+.line-confirm-single .line-badge {
+  font-size: 13px;
+  padding: 5px 16px;
+}
+.line-confirm-scope {
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.line-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 18px 32px 24px;
+}
+.line-confirm .line-confirm-actions .btn-primary {
+  background: var(--lc);
+  border-color: var(--lc);
+}
+.line-confirm-foot {
+  margin: -10px 0 0;
+  padding: 0 32px 22px;
+  font-size: 12px;
+  color: var(--muted);
 }
 .line-pick {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 22px;
 }
 .line-pick-opt {
   --lc: var(--brand);
+  position: relative;
   display: grid;
-  gap: 2px;
-  text-align: left;
-  padding: 12px 14px;
+  justify-items: center;
+  gap: 4px;
+  padding: 20px 12px 16px;
   border: 1px solid var(--line-strong);
-  border-radius: var(--r);
+  border-radius: var(--r-lg);
   background: transparent;
   cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 .line-pick-opt.express {
   --lc: var(--express);
 }
 .line-pick-opt b {
-  letter-spacing: 0.04em;
+  font-size: 15px;
+  letter-spacing: 0.06em;
   color: var(--lc);
 }
 .line-pick-opt span {
   font-size: 12px;
   color: var(--muted);
+}
+/* วงกลมบอกสถานะเลือก มุมขวาบนของการ์ด */
+.line-pick-dot {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-strong);
+}
+.line-pick-opt[aria-checked='true'] .line-pick-dot {
+  border-color: var(--lc);
+  background: radial-gradient(var(--lc) 0 4px, transparent 4.5px);
 }
 .line-pick-opt:hover:not(:disabled) {
   border-color: var(--lc);
@@ -821,19 +864,19 @@ h3 {
   outline: 2px solid var(--lc);
   outline-offset: 2px;
 }
-.line-confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 14px 24px;
-  border-top: 1px solid var(--line);
-}
 @media (max-width: 420px) {
-  .line-confirm-actions {
-    flex-direction: column-reverse;
+  .line-confirm-body {
+    padding: 28px 20px 20px;
   }
-  .line-confirm-actions .btn {
-    width: 100%;
+  .line-confirm-actions {
+    grid-template-columns: 1fr;
+    padding: 16px 20px 20px;
+  }
+  .line-confirm-actions .btn-cancel {
+    order: 1;
+  }
+  .line-confirm-foot {
+    padding: 0 20px 20px;
   }
 }
 .login-footer {

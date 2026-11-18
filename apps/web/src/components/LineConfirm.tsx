@@ -127,6 +127,7 @@ export default function LineConfirm({
           aria-describedby="lc-desc"
         >
           <div className="line-confirm-body">
+            <img className="line-confirm-logo" src="/logo-sidebar.png" alt="" aria-hidden="true" />
             <p className="line-confirm-eyebrow">ยืนยันการเข้าใช้งาน</p>
             <h2 id="lc-title">
               {canSwitch ? 'เลือกแผนกที่ต้องการเข้าใช้งาน' : (
@@ -135,8 +136,11 @@ export default function LineConfirm({
                 </>
               )}
             </h2>
+            <p className="line-confirm-account">
+              บัญชี <b>{email}</b>
+            </p>
 
-            {canSwitch && (
+            {canSwitch ? (
               <div className="line-pick" role="radiogroup" aria-label="แผนกที่เข้าใช้งาน">
                 {(['B2B', 'EXPRESS'] as const).map((l) => (
                   <button
@@ -148,41 +152,27 @@ export default function LineConfirm({
                     onClick={() => setChosen(l)}
                     disabled={!!busy}
                   >
+                    <i className="line-pick-dot" aria-hidden="true" />
                     <b>{lineLabel(l)}</b>
                     <span>{LINE_DESC[l]}</span>
                   </button>
                 ))}
               </div>
+            ) : (
+              <div className="line-confirm-single">
+                <span className={`line-badge${express ? ' express' : ''}`}>{label}</span>
+              </div>
             )}
 
-            <p id="lc-desc" className="muted" style={{ margin: '12px 0 0', fontSize: 14 }}>
-              {canSwitch ? `แผนก ${label}: ` : 'บัญชีนี้มีสิทธิ์'}
+            <p id="lc-desc" className="line-confirm-scope">
+              {canSwitch ? '' : 'บัญชีนี้มีสิทธิ์'}
               {scopeText(chosen)}
             </p>
 
-            <dl className="line-confirm-meta">
-              <div>
-                <dt>บัญชี</dt>
-                <dd>{email}</dd>
-              </div>
-              <div>
-                <dt>แผนกที่เข้าใช้งาน</dt>
-                <dd>
-                  <span className={`line-badge${express ? ' express' : ''}`}>{label}</span>
-                </dd>
-              </div>
-            </dl>
-
             {err && (
-              <div className="note-box err" role="alert" style={{ marginBottom: 12 }}>
+              <div className="note-box err" role="alert" style={{ marginTop: 14 }}>
                 {err}
               </div>
-            )}
-
-            {!canSwitch && (
-              <p className="muted" style={{ margin: 0, fontSize: 12 }}>
-                หากแผนกไม่ถูกต้อง กด "ยกเลิก" แล้วติดต่อผู้ดูแลระบบ
-              </p>
             )}
           </div>
 
@@ -197,9 +187,12 @@ export default function LineConfirm({
               onClick={() => void confirm()}
               disabled={!!busy}
             >
-              {busy === 'confirm' ? 'กำลังเข้าสู่ระบบ…' : `ยืนยันเข้าใช้งาน ${label}`}
+              {busy === 'confirm' ? 'กำลังเข้าสู่ระบบ…' : `เข้าใช้งาน ${label}`}
             </button>
           </div>
+          {!canSwitch && (
+            <p className="line-confirm-foot">หากแผนกไม่ถูกต้อง กด "ยกเลิก" แล้วติดต่อผู้ดูแลระบบ</p>
+          )}
         </div>
       </div>
     </div>
