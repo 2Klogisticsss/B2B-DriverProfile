@@ -50,7 +50,7 @@ const LINE_DESC: Record<BusinessLine, string> = {
 function scopeText(line: BusinessLine) {
   return (
     `เข้าถึงเฉพาะข้อมูลพนักงานขับรถ ประวัติงาน และการประเมินของ${LINE_DESC[line]} เท่านั้น ` +
-    `ข้อมูลของฝั่ง ${lineLabel(OTHER[line])} จะไม่แสดงในระบบ`
+    `ข้อมูลของแผนก ${lineLabel(OTHER[line])} จะไม่แสดงในระบบ`
   )
 }
 
@@ -98,7 +98,7 @@ export default function LineConfirm({
     try {
       await onConfirm(chosen)
     } catch {
-      setErr('เปลี่ยนฝั่งไม่สำเร็จ ลองใหม่อีกครั้ง')
+      setErr('เปลี่ยนแผนกไม่สำเร็จ ลองใหม่อีกครั้ง')
       setBusy(null)
     }
   }
@@ -129,15 +129,15 @@ export default function LineConfirm({
           <div className="line-confirm-body">
             <p className="line-confirm-eyebrow">ยืนยันการเข้าใช้งาน</p>
             <h2 id="lc-title">
-              {canSwitch ? 'เลือกฝั่งที่ต้องการเข้าใช้งาน' : (
+              {canSwitch ? 'เลือกแผนกที่ต้องการเข้าใช้งาน' : (
                 <>
-                  เข้าสู่ระบบฝั่ง <span className="line-confirm-name">{label}</span>
+                  เข้าสู่ระบบแผนก <span className="line-confirm-name">{label}</span>
                 </>
               )}
             </h2>
 
             {canSwitch && (
-              <div className="line-pick" role="radiogroup" aria-label="ฝั่งที่เข้าใช้งาน">
+              <div className="line-pick" role="radiogroup" aria-label="แผนกที่เข้าใช้งาน">
                 {(['B2B', 'EXPRESS'] as const).map((l) => (
                   <button
                     key={l}
@@ -156,7 +156,7 @@ export default function LineConfirm({
             )}
 
             <p id="lc-desc" className="muted" style={{ margin: '12px 0 0', fontSize: 14 }}>
-              {canSwitch ? `ฝั่ง ${label}: ` : 'บัญชีนี้มีสิทธิ์'}
+              {canSwitch ? `แผนก ${label}: ` : 'บัญชีนี้มีสิทธิ์'}
               {scopeText(chosen)}
             </p>
 
@@ -166,7 +166,7 @@ export default function LineConfirm({
                 <dd>{email}</dd>
               </div>
               <div>
-                <dt>ฝั่งที่เข้าใช้งาน</dt>
+                <dt>แผนกที่เข้าใช้งาน</dt>
                 <dd>
                   <span className={`line-badge${express ? ' express' : ''}`}>{label}</span>
                 </dd>
@@ -181,7 +181,7 @@ export default function LineConfirm({
 
             {!canSwitch && (
               <p className="muted" style={{ margin: 0, fontSize: 12 }}>
-                หากฝั่งไม่ถูกต้อง กด "ยกเลิก" แล้วติดต่อผู้ดูแลระบบ
+                หากแผนกไม่ถูกต้อง กด "ยกเลิก" แล้วติดต่อผู้ดูแลระบบ
               </p>
             )}
           </div>
