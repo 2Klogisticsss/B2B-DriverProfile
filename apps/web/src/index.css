@@ -796,7 +796,16 @@ h3 {
 }
 .line-confirm-single .line-badge {
   font-size: 13px;
-  padding: 5px 16px;
+  gap: 8px;
+  padding: 3px 16px 3px 3px;
+}
+.line-confirm-single .line-badge-ico {
+  width: 26px;
+  height: 26px;
+}
+.line-confirm-single .line-badge-ico svg {
+  width: 14px;
+  height: 14px;
 }
 .line-confirm-scope {
   margin: 20px 0 0;
@@ -2792,21 +2801,46 @@ fieldset.fs > legend {
 }
 
 /* ป้ายฝั่งธุรกิจ (B2B / EXPRESS) — โชว์ตลอดเวลาที่เมนู ให้รู้เสมอว่ากำลังทำงานกับข้อมูลฝั่งไหน */
+/* ตราแผนก — วงกลมไอคอนทึบไล่สี + ชื่อแผนกตัวห่าง บนพื้นไล่สีอ่อน เส้นขอบสีแผนก
+   --lb-a/--lb-b = สีไล่ของวงกลม (เข้ม→สว่าง) ใช้ค่าเดียวกันทั้งธีมสว่าง/มืด เพราะไอคอนขาวต้องอ่านออกเสมอ */
 .line-badge {
+  --lb-a: #0a6fa8;
+  --lb-b: #0f97e1;
+  --lb-ink: var(--brand-strong);
+  --lb-soft: var(--brand-soft);
+  --lb-line: var(--brand-line);
   display: inline-flex;
   align-items: center;
-  font-size: 11px;
+  gap: 6px;
+  padding: 2px 10px 2px 2px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 2px 8px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--brand-line);
-  background: var(--brand-soft);
-  color: var(--brand-strong);
+  letter-spacing: 0.12em;
+  line-height: 1;
   white-space: nowrap;
+  color: var(--lb-ink);
+  border: 1px solid var(--lb-line);
+  border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--lb-soft), color-mix(in srgb, var(--lb-soft) 35%, transparent));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 1px 6px color-mix(in srgb, var(--lb-b) 18%, transparent);
+  vertical-align: middle;
 }
 .line-badge.express {
-  border-color: var(--express-line);
-  background: var(--express-soft);
-  color: var(--express);
+  --lb-a: #6d28d9;
+  --lb-b: #a476ff;
+  --lb-ink: var(--express);
+  --lb-soft: var(--express-soft);
+  --lb-line: var(--express-line);
+}
+.line-badge-ico {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, var(--lb-b), var(--lb-a));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--lb-b) 22%, transparent);
 }

@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { BusinessLine } from '../types/database'
 import { lineLabel } from '../lib/lines'
+import LineBadge from './LineBadge'
 import { applyTheme, readTheme } from '../lib/theme'
 
 /**
@@ -160,7 +161,7 @@ export default function LineConfirm({
               </div>
             ) : (
               <div className="line-confirm-single">
-                <span className={`line-badge${express ? ' express' : ''}`}>{label}</span>
+                <LineBadge line={chosen} />
               </div>
             )}
 
