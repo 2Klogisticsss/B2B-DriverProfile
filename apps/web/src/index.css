@@ -647,16 +647,16 @@ h3 {
   background-color: var(--ground);
   background-image:
     radial-gradient(
-      ellipse 520px 420px at 50% 46%,
-      color-mix(in srgb, var(--brand) 13%, transparent),
+      ellipse 640px 500px at 50% 46%,
+      color-mix(in srgb, var(--brand) 22%, transparent),
       transparent 70%
     ),
     radial-gradient(
-      ellipse 1200px 600px at 50% -18%,
-      color-mix(in srgb, var(--brand) 11%, transparent),
-      transparent 62%
+      ellipse 1300px 680px at 50% -18%,
+      color-mix(in srgb, var(--brand) 20%, transparent),
+      transparent 64%
     ),
-    linear-gradient(180deg, color-mix(in srgb, var(--brand) 4%, var(--ground)), var(--ground) 55%);
+    linear-gradient(180deg, color-mix(in srgb, var(--brand) 12%, var(--ground)), color-mix(in srgb, var(--brand) 5%, var(--ground)) 70%);
 }
 .login-page::before {
   content: '';
@@ -666,7 +666,7 @@ h3 {
   background-image: repeating-radial-gradient(
     circle at 50% 46%,
     transparent 0 139px,
-    color-mix(in srgb, var(--ink) 7%, transparent) 139px 140px
+    color-mix(in srgb, var(--ink) 10%, transparent) 139px 140px
   );
   -webkit-mask-image: radial-gradient(circle at 50% 46%, transparent 18%, #000 32%, transparent 68%);
   mask-image: radial-gradient(circle at 50% 46%, transparent 18%, #000 32%, transparent 68%);
@@ -677,7 +677,7 @@ h3 {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(ellipse at 50% 46%, transparent 55%, rgb(0 0 0 / 0.45) 100%);
+  background: radial-gradient(ellipse at 50% 46%, transparent 65%, rgb(0 0 0 / 0.22) 100%);
   pointer-events: none;
 }
 .login-shell {
