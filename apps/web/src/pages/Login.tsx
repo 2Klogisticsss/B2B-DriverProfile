@@ -141,11 +141,11 @@ export default function Login() {
           {/* ponytail: ไม่มีระบบรีเซ็ตรหัสเอง — บัญชีอนุมัติโดยองค์กร ให้ admin รีเซ็ตใน Supabase.
               ถ้าต้องการให้รีเซ็ตเองทางอีเมล ต้องเพิ่ม resetPasswordForEmail + หน้าตั้งรหัสใหม่ */}
           <p className="login-hint muted" style={{ textAlign: 'center', marginTop: 14 }}>
-            ลืมรหัสผ่านหรือเข้าใช้งานไม่ได้? ติดต่อผู้ดูแลระบบของฝ่าย
+            ลืมรหัสผ่านหรือเข้าใช้งานไม่ได้? ติดต่อผู้ดูแลระบบ
           </p>
         </form>
 
-        <p className="login-footer">เข้าถึงได้เฉพาะบัญชีที่ได้รับอนุมัติจากองค์กร · 2K Logistics</p>
+        <p className="login-footer">เข้าถึงได้เฉพาะบัญชีที่ได้รับอนุมัติจากองค์กร · 2Klogistics</p>
       </div>
     </div>
   )
