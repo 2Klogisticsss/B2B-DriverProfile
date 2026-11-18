@@ -633,6 +633,9 @@ h3 {
 }
 
 /* =========================================================== หน้าเข้าสู่ระบบ */
+/* พื้นหลังหน้า login (และ popup ยืนยันแผนก) — เรียบหรู ไม่มีลวดลายรก:
+   ไล่เฉดน้ำเงินเข้มจากบน, แสงนุ่มรองหลังการ์ด, วงแหวนบาง ๆ จางออกจากกลางจอ (นึกถึงสัญญาณ/รัศมี
+   เส้นทาง) และขอบมืดรอบจอดึงสายตาเข้ากลาง */
 .login-page {
   min-height: 100vh;
   display: grid;
@@ -640,29 +643,41 @@ h3 {
   padding: 24px 16px;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
   background-color: var(--ground);
   background-image:
     radial-gradient(
-      ellipse 900px 520px at 50% -10%,
-      color-mix(in srgb, var(--brand) 16%, transparent),
-      transparent 60%
+      ellipse 520px 420px at 50% 46%,
+      color-mix(in srgb, var(--brand) 13%, transparent),
+      transparent 70%
     ),
     radial-gradient(
-      ellipse 640px 480px at 100% 100%,
-      color-mix(in srgb, var(--brand) 9%, transparent),
-      transparent 55%
-    );
+      ellipse 1200px 600px at 50% -18%,
+      color-mix(in srgb, var(--brand) 11%, transparent),
+      transparent 62%
+    ),
+    linear-gradient(180deg, color-mix(in srgb, var(--brand) 4%, var(--ground)), var(--ground) 55%);
 }
-/* จุดตาข่ายบาง ๆ คลุมเฉพาะแถบบนให้รู้สึกเหมือนแผนที่/เส้นทาง จางลงตามหลังการ์ด */
 .login-page::before {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
-  background-size: 26px 26px;
-  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 15%, #000 0%, transparent 72%);
-  mask-image: radial-gradient(ellipse 65% 55% at 50% 15%, #000 0%, transparent 72%);
-  opacity: 0.6;
+  z-index: -1;
+  background-image: repeating-radial-gradient(
+    circle at 50% 46%,
+    transparent 0 139px,
+    color-mix(in srgb, var(--ink) 7%, transparent) 139px 140px
+  );
+  -webkit-mask-image: radial-gradient(circle at 50% 46%, transparent 18%, #000 32%, transparent 68%);
+  mask-image: radial-gradient(circle at 50% 46%, transparent 18%, #000 32%, transparent 68%);
+  pointer-events: none;
+}
+.login-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse at 50% 46%, transparent 55%, rgb(0 0 0 / 0.45) 100%);
   pointer-events: none;
 }
 .login-shell {
