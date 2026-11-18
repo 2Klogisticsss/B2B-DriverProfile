@@ -30,6 +30,8 @@ interface AuthState {
   /** ฝั่งของบัญชี — null ระหว่างยังโหลด profile ไม่เสร็จ (ห้ามเดาเป็น B2B: งานที่บันทึกตอนนั้น
    *  จะถูกตีตราผิดฝั่ง ฐานข้อมูลปฏิเสธอยู่ดี แต่ไม่ควรให้ไปถึงตรงนั้น) */
   businessLine: BusinessLine | null
+  /** เลือกฝั่ง (เฉพาะบัญชีใน line_switchers — 0044) ย้าย profiles.business_line ที่ฐานข้อมูล */
+  switchLine: (line: BusinessLine) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -115,6 +117,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       can: (...roles) => (profile ? roles.includes(profile.role) : false),
       canSeeActivityLog: !!profile?.email && ACTIVITY_LOG_EMAILS.includes(profile.email.toLowerCase()),
       businessLine: profile?.business_line ?? null,
+      switchLine: async (line) => {
+        const { error } = await supabase.rpc('set_my_line', { p_line: line })
+        if (error) throw error
+        setProfile((p) => (p ? { ...p, business_line: line } : p))
+      },
       signOut: async () => {
         // บันทึก logout_at ก่อนตัด session จริง — ได้เวลาออกที่แม่นยำสำหรับคนที่กดออกเองจริง ๆ
         // (ทำก่อน signOut เสมอ เพราะ signOut แล้ว session หาย ไม่มีสิทธิ์ update แถวตัวเองอีก)

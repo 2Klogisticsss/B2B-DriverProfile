@@ -249,7 +249,7 @@ function BootScreen() {
 }
 
 function Shell() {
-  const { session, profile, loading, canSeeActivityLog, signOut, businessLine } = useAuth()
+  const { session, profile, loading, canSeeActivityLog, signOut, businessLine, switchLine } = useAuth()
 
   // เปลี่ยนบัญชีในแท็บเดิม (ออกแล้วเข้าด้วยบัญชีอื่น) ต้องล้างแคชข้อมูลทิ้งทั้งหมด — แคชถูกเก็บด้วย
   // key ที่ไม่มีตัวผู้ใช้ เช่น ['customers'] ไม่ล้างจะเห็นข้อมูลของบัญชีก่อนหน้า (อาจเป็นอีกฝั่ง)
@@ -308,8 +308,11 @@ function Shell() {
         <LineConfirm
           line={businessLine}
           email={session.user.email ?? ''}
-          name={profile?.full_name}
-          onConfirm={() => {
+          onConfirm={async (chosen) => {
+            if (chosen !== businessLine) {
+              await switchLine(chosen)
+              qc.clear() // ข้อมูลที่แคชไว้เป็นของฝั่งเดิม
+            }
             setPendingLineConfirm(false)
             rerender()
           }}

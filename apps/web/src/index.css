@@ -781,6 +781,46 @@ h3 {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+.line-pick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+.line-pick-opt {
+  --lc: var(--brand);
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r);
+  background: transparent;
+  cursor: pointer;
+}
+.line-pick-opt.express {
+  --lc: var(--express);
+}
+.line-pick-opt b {
+  letter-spacing: 0.04em;
+  color: var(--lc);
+}
+.line-pick-opt span {
+  font-size: 12px;
+  color: var(--muted);
+}
+.line-pick-opt:hover:not(:disabled) {
+  border-color: var(--lc);
+}
+.line-pick-opt[aria-checked='true'] {
+  border-color: var(--lc);
+  box-shadow: inset 0 0 0 1px var(--lc);
+  background: color-mix(in srgb, var(--lc) 10%, transparent);
+}
+.line-pick-opt:focus-visible {
+  outline: 2px solid var(--lc);
+  outline-offset: 2px;
+}
 .line-confirm-actions {
   display: flex;
   justify-content: flex-end;
